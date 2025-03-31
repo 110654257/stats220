@@ -1,0 +1,69 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+library(tidyverse)
+```
+
+```{css}
+h2 {
+  color: #000d8a;
+}
+```
+
+## Public Transportation Commute Report
+###Nature of the data
+Everyday commutes on public transit are monitored and examined in this report, with particular attention paid to public transportation' levels of crowdedness, the types of transportation used, and the duration of the travel.
+```{r}
+#Read data into logged_data from the CSV URL.
+logged_data <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQLiobDlrqJqmxWeDUJB0HhVA_GvRpEu06c3n7FPCTKsxtcahm25vgr09aR4VGwDtXtQr8UipWrQZIf/pub?gid=739586808&single=true&output=csv")
+
+#Inspect data frame
+glimpse(logged_data)
+
+#Rename variables from logged_data to create latest_data
+latest_data <- logged_data %>%
+  rename(
+    timestamp = "Timestamp",
+    duration = "How.many.minutes.is.your.commute.today.",
+    transport = "Which.public.transportation.did.you.use.",
+    crowdedness = "How.crowded.was.the.vehicle."
+  )
+
+#Exploring data
+min_duration <- min(latest_data$duration, na.rm = TRUE)    #Shortest commute duration
+mean_duration <- mean(latest_data$duration, na.rm = TRUE)    #Average commute duration
+total_commutes <- nrow(latest_data)     #Total number of observes
+
+#Dynamic comments
+paste("The shortest commute duration on this survey is", 
+      min_duration, 
+      "minutes.", 
+      "The average commute duration on this survey is", 
+      mean_duration, 
+      "minutes.", 
+      "The total number of recorded commutes are",
+      total_commutes,
+      collapse = " ")
+
+#Bar Chart 1: frequency of public transportation type
+ggplot(latest_data, aes(x = transport)) +
+  geom_bar(fill = "#33fff6") + 
+  labs(title = "Frequency of Public Transport Types",
+       x = "Transport Type",
+       y = "Number of Commutes") +
+  theme_minimal()
+
+#Bar Chart 2: Distribution of commmute duration
+ggplot(latest_data, aes(x = duration)) +
+  geom_bar(fill = "#ff5b33") +
+  labs(title = "Distribution of Commute Durations",
+       x = "Duration (minutes)",
+       y = "Count") +
+  theme_minimal()
+
+#Commented Section: min,mean,nrow() from Lab 2A,2B; used pipes,ggplot(),labs() from lab 2b. Comments: included.  indenting: ggplot() and pipes     white space: seperate rows.
+```
